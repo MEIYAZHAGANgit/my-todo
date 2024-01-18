@@ -1,78 +1,86 @@
-body {
-  margin: 0;
-  font-family: 'Arial', sans-serif;
-  background-color: #f0f0f0;
-}
+import React, { useState } from 'react';
+import './App.css';
 
-.todo-container {
-  max-width: 800px;
-  margin: auto;
-  padding: 20px;
-  background-color: #fff;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  margin-top: 50px;
-}
+const TodoApp = () => {
+  const [tasks, setTasks] = useState([]);
+  const [newTask, setNewTask] = useState({ name: '', description: '', status: 'Incomplete' });
+  const [editTask, setEditTask] = useState(null);
 
-h1 {
-  text-align: center;
-  color: #333;
-}
+  const addTask = () => {
+    if (newTask.name.trim() === '' || newTask.description.trim() === '') {
+      alert('Task name and description cannot be empty.');
+      return;
+    }
 
-.input-container {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
-}
+    setTasks([...tasks, newTask]);
+    setNewTask({ name: '', description: '', status: 'Incomplete' });
+  };
 
-input,
-textarea {
-  margin-bottom: 10px;
-  padding: 10px;
-  font-size: 16px;
-}
+  const editTaskHandler = (index) => {
+    setEditTask(index);
+    setNewTask(tasks[index]);
+  };
 
-.add-btn,
-.update-btn {
-  padding: 10px;
-  font-size: 16px;
-  background-color: #4caf50;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
+  const updateTask = () => {
+    const updatedTasks = [...tasks];
+    updatedTasks[editTask] = newTask;
+    setTasks(updatedTasks);
+    setNewTask({ name: '', description: '', status: 'Incomplete' });
+    setEditTask(null);
+  };
 
-.task-list {
-  list-style-type: none;
-  padding: 0;
-}
+  const deleteTask = (index) => {
+    const updatedTasks = [...tasks];
+    updatedTasks.splice(index, 1);
+    setTasks(updatedTasks);
+  };
 
-.task-item {
-  border: 1px solid #ccc;
-  padding: 20px;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+  return (
+    <div className="todo-container">
+      <h1>Todo App</h1>
+      <div className="input-container">
+        <input
+          type="text"
+          placeholder="Task Name"
+          value={newTask.name}
+          onChange={(e) => setNewTask({ ...newTask, name: e.target.value })}
+        />
+        <textarea
+          placeholder="Description"
+          value={newTask.description}
+          onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+        ></textarea>
+        {editTask !== null ? (
+          <button className="update-btn" onClick={updateTask}>
+            Update Task
+          </button>
+        ) : (
+          <button className="add-btn" onClick={addTask}>
+            Add Task
+          </button>
+        )}
+      </div>
+      <ul className="task-list">
+        {tasks.map((task, index) => (
+          <li key={index} className="task-item">
+            <div>
+              <strong>{task.name}</strong>
+              <p>{task.description}</p>
+              <span>Status: {task.status}</span>
+            </div>
+            <div>
+              <button className="edit-btn" onClick={() => editTaskHandler(index)}>
+                Edit
+              </button>
+              <button className="delete-btn" onClick={() => deleteTask(index)}>
+                Delete
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
-.edit-btn,
-.delete-btn {
-  padding: 10px;
-  font-size: 16px;
-  margin-left: 10px;
-  cursor: pointer;
-}
-
-.edit-btn {
-  background-color: #2196f3;
-  color: #fff;
-}
-
-.delete-btn {
-  background-color: #f44336;
-  color: #fff;
-}
+export default TodoApp;
